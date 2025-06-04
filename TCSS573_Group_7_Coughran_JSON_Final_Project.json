@@ -1,0 +1,2575 @@
+[
+    {
+        "id": "ac4ec082e1f6110b",
+        "type": "tab",
+        "label": "FINAL_PROJECT",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2fc97f19d5fafbde",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "USB Camera and Real-Time Image Display on Dashboard",
+        "info": "",
+        "x": 790,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "32301f3d7760d0de",
+        "type": "usbcamera",
+        "z": "ac4ec082e1f6110b",
+        "filemode": "1",
+        "filename": "image.jpg",
+        "filedefpath": "0",
+        "filepath": "/home/pi/Desktop/FINAL_PROJECT_SNAPSHOT",
+        "fileformat": "jpeg",
+        "resolution": "5",
+        "name": "",
+        "x": 750,
+        "y": 700,
+        "wires": [
+            [
+                "6e155e73c9dc95d0"
+            ]
+        ]
+    },
+    {
+        "id": "6e155e73c9dc95d0",
+        "type": "http request",
+        "z": "ac4ec082e1f6110b",
+        "name": "CAM URI",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://10.19.68.114:1200/cam",
+        "tls": "",
+        "persist": true,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 980,
+        "y": 700,
+        "wires": [
+            [
+                "8d8a9c7c76edd2b7"
+            ]
+        ]
+    },
+    {
+        "id": "a126922b3ce9c160",
+        "type": "ui_template",
+        "z": "ac4ec082e1f6110b",
+        "group": "28591684864218af",
+        "name": "Display image",
+        "order": 3,
+        "width": "10",
+        "height": "6",
+        "format": "\n<img alt=\"HTTP Snap\" src=\"data:image/jpg;base64,{{msg.payload}}\" />\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 1500,
+        "y": 700,
+        "wires": [
+            [
+                "6151d839d29ae860"
+            ]
+        ]
+    },
+    {
+        "id": "8d8a9c7c76edd2b7",
+        "type": "base64",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "action": "",
+        "property": "payload",
+        "x": 1260,
+        "y": 700,
+        "wires": [
+            [
+                "a126922b3ce9c160"
+            ]
+        ]
+    },
+    {
+        "id": "d61bda1c2ec2a54d",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "d": true,
+        "name": "Part A: Custom Vision Model via Azure",
+        "info": "",
+        "x": 530,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "6151d839d29ae860",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "getImage",
+        "filename": "/home/pi/Desktop/FINAL_PROJECT_SNAPSHOT/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 500,
+        "y": 360,
+        "wires": [
+            [
+                "59b5a317b3c41fec"
+            ]
+        ]
+    },
+    {
+        "id": "fcee2fa3f8bc5664",
+        "type": "ui_template",
+        "z": "ac4ec082e1f6110b",
+        "group": "28591684864218af",
+        "name": "Position Classification",
+        "order": 4,
+        "width": "10",
+        "height": "2",
+        "format": "<div>\n    <style>\n        .largeBold {\n            font-size: 36px;\n            /* Adjust the size as needed */\n            font-weight: bold;\n            text-align: center;\n        }\n    </style>\n\n    <p class=\"largeBold\" ng-if=\"!Array.isArray(msg.payload)\" ng-bind=\"msg.payload\"></p>\n\n    <ul ng-if=\"Array.isArray(msg.payload)\">\n        <li ng-repeat=\"item in msg.payload track by $index\" class=\"largeBold\">{{item}}</li>\n    </ul>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1360,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "59b5a317b3c41fec",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "prepareToken",
+        "func": "var image = msg.payload;\n\nmsg.headers = {\n  \"Prediction-Key\": \"EjfqCbbycy7ioWuuTx8buwUpZhVvfyrVDymy83cWrQhNe1atLMJmJQQJ99BAACLArgHXJ3w3AAAIACOGOPr1\",\n  'Content-Type': 'application/octet-stream'\n};\n\nmsg.payload = image;\n\nreturn msg;\n\n/*\n\n\n*/\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 360,
+        "wires": [
+            [
+                "68eff4884fbb222b"
+            ]
+        ]
+    },
+    {
+        "id": "68eff4884fbb222b",
+        "type": "http request",
+        "z": "ac4ec082e1f6110b",
+        "name": "issueToken",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://a1coughran-prediction.cognitiveservices.azure.com/customvision/v3.0/Prediction/523cdc53-d11d-4e4b-a4d7-30b22eade869/classify/iterations/IterationFinal_Project/image",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 910,
+        "y": 360,
+        "wires": [
+            [
+                "5fb170f0aa91196b"
+            ]
+        ]
+    },
+    {
+        "id": "5fb170f0aa91196b",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Classify image",
+        "func": "// Ensure msg.payload exists and contains predictions\nif (msg.payload && Array.isArray(msg.payload.predictions)) {\n    let results = [];\n\n    // Loop through the predictions array\n    for (let i = 0; i < msg.payload.predictions.length; i++) {\n        const prediction = msg.payload.predictions[i];\n\n        // Lower probability threshold to 50% to capture \"convertible: 52.8%\"\n        if (prediction.probability > 0.50) {\n            results.push(`${prediction.tagName}: ${(prediction.probability * 100).toFixed(1)}%`);\n        }\n    }\n\n    // If predictions exist, send them; otherwise, send \"n/a\"\n    msg.payload = results.length > 0 ? results.join(\", \") : \"--------\";\n    return msg;\n} \nelse {\n    node.warn(\"Invalid response format: Expected 'predictions' array in payload.\");\n    msg.payload = \"-----------------\";\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 360,
+        "wires": [
+            [
+                "fcee2fa3f8bc5664",
+                "8cbda29ab30d77c9"
+            ]
+        ]
+    },
+    {
+        "id": "fe7ad48a1a41b6a3",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "Connect to Azure Custom Vision Model",
+        "info": "",
+        "x": 890,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "3fa525c0170424c9",
+        "type": "ui_button",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "group": "28591684864218af",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "BEGIN TRAINING",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "green",
+        "className": "",
+        "icon": "",
+        "payload": "start",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "09f98e9db5cf3a24"
+            ]
+        ]
+    },
+    {
+        "id": "09f98e9db5cf3a24",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Activate Camera; Initialize Position & Points",
+        "func": "flow.set(\"cameraActive\", true);\nflow.set(\"Jojo_Points\", 0);\nflow.set(\"Dad_Points\", 0);\nflow.set(\"Previous_Position\", 1)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5d2cdbd9e3c19058",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Check Camera State",
+        "func": "if (flow.get(\"cameraActive\")) {\n    // Only pass the message if the camera is active\n    return msg;\n}\nreturn null; // Otherwise, drop the message",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 620,
+        "wires": [
+            [
+                "c4c96109f949d32b"
+            ]
+        ]
+    },
+    {
+        "id": "65a87856fe898a27",
+        "type": "ui_button",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "group": "28591684864218af",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "STOP TRAINING",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "red",
+        "className": "",
+        "icon": "",
+        "payload": "stop",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "7137cbd6e7d24caf"
+            ]
+        ]
+    },
+    {
+        "id": "7137cbd6e7d24caf",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Deactivate Camera",
+        "func": "flow.set(\"cameraActive\", false);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 20,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4a9449af9ebe05c5",
+        "type": "grove digital sensor",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "board": "262d523436a1548f",
+        "sensor": "dht11",
+        "repeat": "15",
+        "pin": "7",
+        "x": 130,
+        "y": 1000,
+        "wires": [
+            [
+                "29d4c32cecee8314"
+            ]
+        ]
+    },
+    {
+        "id": "29d4c32cecee8314",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Temperature Splitter",
+        "func": "// split the data from the grovepi digital\n// sensor and pass to the new payload object\n\nreturn(\n    [\n        {payload:msg.payload.temperature}\n    ]\n)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 1000,
+        "wires": [
+            [
+                "bba7a2d78fa902ef"
+            ]
+        ]
+    },
+    {
+        "id": "a6e4097b8669c125",
+        "type": "ui_template",
+        "z": "ac4ec082e1f6110b",
+        "group": "28591684864218af",
+        "name": "Temperature Compliance",
+        "order": 5,
+        "width": "10",
+        "height": "1",
+        "format": "<div style=\"text-align: center; font-weight: bold;\">\n    <p ng-if=\"!Array.isArray(msg.payload)\" ng-bind=\"msg.payload\"></p>\n\n    <ul ng-if=\"Array.isArray(msg.payload)\">\n        <li ng-repeat=\"item in msg.payload track by $index\">{{item}}</li>\n    </ul>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1050,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bba7a2d78fa902ef",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Temperature Compliance",
+        "func": "if (msg.payload >= 18 && msg.payload <= 22) {\n    msg.payload = `TEMPERATURE (${msg.payload} deg C) IS IBJJF COMPLIANT`;\n} else {\n    msg.payload = `TEMPERATURE (${msg.payload} deg C) IS NOT IBJJF COMPLIANT`;\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 1000,
+        "wires": [
+            [
+                "a6e4097b8669c125"
+            ]
+        ]
+    },
+    {
+        "id": "0f3cbc7b021a42de",
+        "type": "grove digital sensor",
+        "z": "ac4ec082e1f6110b",
+        "name": "Ultrasonic Distance Sensor",
+        "board": "262d523436a1548f",
+        "sensor": "ultrasonic",
+        "repeat": "1",
+        "pin": "3",
+        "x": 150,
+        "y": 1160,
+        "wires": [
+            [
+                "5c02025cf36bb5c8"
+            ]
+        ]
+    },
+    {
+        "id": "5c02025cf36bb5c8",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "checkMotion",
+        "func": "var distance = msg.payload;  // Distance in cm\n\n// Check if athletes are inbounds\nif (distance > 15) {  // If distance is less than 15 cm\n    msg.payload = \"ATHLETES IN BOUNDS\";  // Send motion detection message\n} else {\n    msg.payload = \"ATHLETES OUT OF BOUNDS\";  // Send no motion message\n}\n\nreturn msg;  // Send the message with motion detection and controls for LED and buzzer",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 1160,
+        "wires": [
+            [
+                "6a6faf93c855b797",
+                "70979c11efa7ef7e"
+            ]
+        ]
+    },
+    {
+        "id": "6a6faf93c855b797",
+        "type": "ui_template",
+        "z": "ac4ec082e1f6110b",
+        "group": "28591684864218af",
+        "name": "In Bounds",
+        "order": 5,
+        "width": "10",
+        "height": "1",
+        "format": "<div style=\"text-align: center; font-weight: bold;\">\n    <p ng-if=\"!Array.isArray(msg.payload)\" ng-bind=\"msg.payload\"></p>\n\n    <ul ng-if=\"Array.isArray(msg.payload)\">\n        <li ng-repeat=\"item in msg.payload track by $index\">{{item}}</li>\n    </ul>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 860,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0bfa84ec0531e963",
+        "type": "influxdb out",
+        "z": "ac4ec082e1f6110b",
+        "influxdb": "3d3f98127f512392",
+        "name": "bjj_trainer DB",
+        "measurement": "ATOSTACOMA",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 1380,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "95de67105e9aeb27",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/out_of_bounds.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 1160,
+        "y": 1220,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "70979c11efa7ef7e",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "1 if OOB",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ATHLETES OUT OF BOUNDS",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 620,
+        "y": 1220,
+        "wires": [
+            [
+                "889c61e8b71ffb43"
+            ]
+        ]
+    },
+    {
+        "id": "889c61e8b71ffb43",
+        "type": "delay",
+        "z": "ac4ec082e1f6110b",
+        "name": "limitRate",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "4",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 760,
+        "y": 1220,
+        "wires": [
+            [
+                "95de67105e9aeb27"
+            ]
+        ]
+    },
+    {
+        "id": "1eb74bb67f2c3a46",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Position Transform",
+        "func": "\nif (msg.payload == \"----------\") {\n    msg.payload = 1;\n} else if (msg.payload == \"No Grips\") {\n    msg.payload = 2;\n} else if (msg.payload == \"Grips\") {\n    msg.payload = 3;\n} else if (msg.payload == \"Jojo Applies Guard\") {\n    msg.payload = 4;\n} else if (msg.payload == \"Jojo Applies Side Control\") {\n    msg.payload = 5;\n} else if (msg.payload == \"Jojo Applies Mount\") {\n    msg.payload = 6;\n} else if (msg.payload == \"Jojo In Guard\") {\n    msg.payload = 7;\n} else if (msg.payload == \"Jojo In Side Control\") {\n    msg.payload = 8;\n} else if (msg.payload == \"Jojo In Mount\") {\n    msg.payload = 9;\n} else if (msg.payload == \"Arm Bar\") {\n    msg.payload = 11;\n} else {\n    msg.payload = 0;\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1630,
+        "y": 420,
+        "wires": [
+            [
+                "f75c8d37a74121d6",
+                "f64fe844cdde70a2",
+                "1e6e62acba0c974c",
+                "a335886cfb96aff7",
+                "5d47ef707c2f52d6",
+                "7c6b17ce030fa116",
+                "b3b1be02db443140",
+                "74ab5a16a013d29a",
+                "b3e1e39718e82518",
+                "b1acd0b516e5f132"
+            ]
+        ]
+    },
+    {
+        "id": "f75c8d37a74121d6",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 420,
+        "wires": [
+            [
+                "69c5420ca7c9db10"
+            ]
+        ]
+    },
+    {
+        "id": "69c5420ca7c9db10",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/2.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 420,
+        "wires": [
+            [],
+            [
+                "11e42662decf5b12"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "f64fe844cdde70a2",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "3",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 500,
+        "wires": [
+            [
+                "3305b6340ed399b6"
+            ]
+        ]
+    },
+    {
+        "id": "3305b6340ed399b6",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/3.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 500,
+        "wires": [
+            [],
+            [
+                "22a23085fc934278"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "1e6e62acba0c974c",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 580,
+        "wires": [
+            [
+                "85843a4125f7a180"
+            ]
+        ]
+    },
+    {
+        "id": "85843a4125f7a180",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/4.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 580,
+        "wires": [
+            [],
+            [
+                "b1e3426893436190"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a335886cfb96aff7",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "5",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 660,
+        "wires": [
+            [
+                "04e5ef7215825895"
+            ]
+        ]
+    },
+    {
+        "id": "04e5ef7215825895",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/5.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 660,
+        "wires": [
+            [],
+            [
+                "f8a68a21c86851b2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e13be7fd66f297de",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Check Camera State",
+        "func": "flow.set(\"Jojo_Points\", 0);\nflow.set(\"Dad_Points\", 0);\nflow.set(\"cameraActive\", false);",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2b5fa7a683d4dd53",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 480,
+        "y": 140,
+        "wires": [
+            [
+                "e13be7fd66f297de"
+            ]
+        ]
+    },
+    {
+        "id": "c687adac598a15fa",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "Timer 14 sec",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "14",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 280,
+        "wires": [
+            [
+                "5d2cdbd9e3c19058"
+            ]
+        ]
+    },
+    {
+        "id": "8cbda29ab30d77c9",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "function 11",
+        "func": "msg.payload = msg.payload.split(\":\")[0].trim();\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1330,
+        "y": 360,
+        "wires": [
+            [
+                "1eb74bb67f2c3a46"
+            ]
+        ]
+    },
+    {
+        "id": "ca35f035540da92a",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Arm Bar",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Arm Bar/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 280,
+        "y": 1320,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "359767e1b4d06f94",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "No Grips",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/No Grips/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 280,
+        "y": 1360,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "d0708913178be46d",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Jojo Applies Guard",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo Applies Guard/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 310,
+        "y": 1400,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "c87ad93362a0d60a",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Jojo Applies Mount",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo Applies Mount/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 310,
+        "y": 1440,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "5873d05dc669e4f4",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Side Control",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo Applies Side Control/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 290,
+        "y": 1480,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "f79a8766d0223756",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Jojo In Guard",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo In Guard/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 300,
+        "y": 1520,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "b80ddc6e209e2c68",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Jojo In Mount",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo In Mount/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 300,
+        "y": 1560,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "34f640a402e83bfb",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "Jojo In Side Control",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/Jojo In Side Control/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 310,
+        "y": 1600,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "7e38f1e25dcb4f5e",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "No Grips",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/No Grips/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 280,
+        "y": 1640,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "8ce1c3f444ec5cea",
+        "type": "file in",
+        "z": "ac4ec082e1f6110b",
+        "name": "getImage",
+        "filename": "/home/pi/Desktop/Jo Jo Positions/----------/image.jpg",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 280,
+        "y": 1680,
+        "wires": [
+            [
+                "ded4730c4467dfbc"
+            ]
+        ]
+    },
+    {
+        "id": "ded4730c4467dfbc",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "prepareToken",
+        "func": "var image = msg.payload;\n\nmsg.headers = {\n  \"Prediction-Key\": \"EjfqCbbycy7ioWuuTx8buwUpZhVvfyrVDymy83cWrQhNe1atLMJmJQQJ99BAACLArgHXJ3w3AAAIACOGOPr1\",\n  'Content-Type': 'application/octet-stream'\n};\n\nmsg.payload = image;\n\nreturn msg;\n\n/*\n\n\n*/\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1480,
+        "wires": [
+            [
+                "68eff4884fbb222b"
+            ]
+        ]
+    },
+    {
+        "id": "7caf58106a1c1dc2",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1320,
+        "wires": [
+            [
+                "ca35f035540da92a"
+            ]
+        ]
+    },
+    {
+        "id": "2463e7e1fd819f53",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1360,
+        "wires": [
+            [
+                "359767e1b4d06f94"
+            ]
+        ]
+    },
+    {
+        "id": "46bbdc9f07bf45bb",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1400,
+        "wires": [
+            [
+                "d0708913178be46d"
+            ]
+        ]
+    },
+    {
+        "id": "18966d43d7847a39",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1440,
+        "wires": [
+            [
+                "c87ad93362a0d60a"
+            ]
+        ]
+    },
+    {
+        "id": "33f2b9354d50f066",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1480,
+        "wires": [
+            [
+                "5873d05dc669e4f4"
+            ]
+        ]
+    },
+    {
+        "id": "fc2768e2d5419fa6",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1520,
+        "wires": [
+            [
+                "f79a8766d0223756"
+            ]
+        ]
+    },
+    {
+        "id": "a8e5ed4c010843bc",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1560,
+        "wires": [
+            [
+                "b80ddc6e209e2c68"
+            ]
+        ]
+    },
+    {
+        "id": "4e1903b0a79eebf1",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1600,
+        "wires": [
+            [
+                "34f640a402e83bfb"
+            ]
+        ]
+    },
+    {
+        "id": "8e03f72fdf4cb533",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1640,
+        "wires": [
+            [
+                "7e38f1e25dcb4f5e"
+            ]
+        ]
+    },
+    {
+        "id": "253d2bcdf8034333",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1680,
+        "wires": [
+            [
+                "8ce1c3f444ec5cea"
+            ]
+        ]
+    },
+    {
+        "id": "5d47ef707c2f52d6",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "6",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 740,
+        "wires": [
+            [
+                "d9aaa778b77d6e54"
+            ]
+        ]
+    },
+    {
+        "id": "7c6b17ce030fa116",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "7",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 820,
+        "wires": [
+            [
+                "37b92409d8b32d7d"
+            ]
+        ]
+    },
+    {
+        "id": "b3b1be02db443140",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "8",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 900,
+        "wires": [
+            [
+                "bee050124404fd76"
+            ]
+        ]
+    },
+    {
+        "id": "74ab5a16a013d29a",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "9",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 980,
+        "wires": [
+            [
+                "df7214113d9f94d6"
+            ]
+        ]
+    },
+    {
+        "id": "b3e1e39718e82518",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "10",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 1060,
+        "wires": [
+            [
+                "09b8850e979ae356"
+            ]
+        ]
+    },
+    {
+        "id": "b1acd0b516e5f132",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "11",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 1140,
+        "wires": [
+            [
+                "f7ceced902442ca8"
+            ]
+        ]
+    },
+    {
+        "id": "197b0871876e2c90",
+        "type": "switch",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "5",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2170,
+        "y": 1300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d9aaa778b77d6e54",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/6.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 740,
+        "wires": [
+            [],
+            [
+                "34d91e323ce127fe"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "37b92409d8b32d7d",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/7.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 820,
+        "wires": [
+            [],
+            [
+                "0d53439b9e797314"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "bee050124404fd76",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/8.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 900,
+        "wires": [
+            [],
+            [
+                "636a5f8f0330433c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "df7214113d9f94d6",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/9.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 980,
+        "wires": [
+            [],
+            [
+                "a4addbab4dad05fb"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "09b8850e979ae356",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/10.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2550,
+        "y": 1060,
+        "wires": [
+            [],
+            [
+                "4a23ce43e2a552d7"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "f7ceced902442ca8",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/11.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2540,
+        "y": 1140,
+        "wires": [
+            [],
+            [
+                "51931917f5210826"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "51931917f5210826",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Deactivate Camera",
+        "func": "flow.set(\"cameraActive\", false);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2930,
+        "y": 1140,
+        "wires": [
+            [
+                "6b5479fde5876704",
+                "f3203a821e0a25b6",
+                "799b0ec3fc522aed",
+                "3a1cd02d692cd85f"
+            ]
+        ]
+    },
+    {
+        "id": "99278fc3dfdf9a4b",
+        "type": "ui_template",
+        "z": "ac4ec082e1f6110b",
+        "group": "28591684864218af",
+        "name": "Points",
+        "order": 8,
+        "width": "10",
+        "height": "4",
+        "format": "<div style=\"font-size:46px; text-align:center;\">\n    <strong>Jojo</strong>: <strong>{{msg.Jojo_Points}}</strong> <strong>Opponent</strong>:\n    <strong>{{msg.Dad_Points}}</strong>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 4270,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "82501b30e910404e",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "Timer 1 sec",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 970,
+        "y": 140,
+        "wires": [
+            [
+                "a7f3bc76956cf5e6"
+            ]
+        ]
+    },
+    {
+        "id": "933d97f38f646fe2",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Get Points",
+        "func": "msg.Jojo_Points = flow.get(\"Jojo_Points\");\nmsg.Dad_Points = flow.get(\"Dad_Points\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1430,
+        "y": 140,
+        "wires": [
+            [
+                "99278fc3dfdf9a4b"
+            ]
+        ]
+    },
+    {
+        "id": "c4c96109f949d32b",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "/usr/bin/aplay /home/pi/Desktop/FINAL_PRODUCT_AUDIO_FILES/camera.wav",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 320,
+        "y": 700,
+        "wires": [
+            [],
+            [
+                "32301f3d7760d0de"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "11e42662decf5b12",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "flow.set(\"Previous_Position\", 2)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 420,
+        "wires": [
+            [
+                "0d07a554c07368c5"
+            ]
+        ]
+    },
+    {
+        "id": "22a23085fc934278",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "flow.set(\"Previous_Position\", 3)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 500,
+        "wires": [
+            [
+                "8772ebcf21d77ca2"
+            ]
+        ]
+    },
+    {
+        "id": "67e756bee25aff8a",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(2) No Grips",
+        "info": "",
+        "x": 2330,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "57b85f54bc6bccb2",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(3) Grips",
+        "info": "",
+        "x": 2320,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "084de77c73e764bd",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(4) Jojo Applies Guard",
+        "info": "",
+        "x": 2360,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "f62d092abc8f6d75",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(5) Jojo Applies Side Control",
+        "info": "",
+        "x": 2380,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "2aace2fa41d1b2bc",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(6) Jojo Applies Mount",
+        "info": "",
+        "x": 2360,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "d2b01a02c1737a55",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(7) Jojo In Guard",
+        "info": "",
+        "x": 2340,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "6ecae7166bc1035a",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(8) Jojo In Side Control",
+        "info": "",
+        "x": 2360,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "5857cca878a86de4",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(9) Jojo In Mount",
+        "info": "",
+        "x": 2340,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "adbaae454db5c8cf",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(10) Repeat Position",
+        "info": "",
+        "x": 2350,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "11760f019bcb5dc9",
+        "type": "comment",
+        "z": "ac4ec082e1f6110b",
+        "name": "(11) Arm Bar (Victory)",
+        "info": "",
+        "x": 2360,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "b1e3426893436190",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "flow.set(\"Previous_Position\", 4)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 580,
+        "wires": [
+            [
+                "e9279ac570163c99"
+            ]
+        ]
+    },
+    {
+        "id": "f8a68a21c86851b2",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "// Retrieve the current Previous_Position value\nvar previous = flow.get(\"Previous_Position\");\n\n// Determine points to add based on the Previous_Position value\nvar pointsToAdd = (previous === 3 || previous === 7) ? 5 : 3;\n\n// Retrieve the current Jojo_Points (defaulting to 0 if not set)\nvar jojoPoints = flow.get(\"Jojo_Points\") || 0;\n\n// Add the determined points\njojoPoints += pointsToAdd;\n\n// Update the global variable\nflow.set(\"Jojo_Points\", jojoPoints);\n\nflow.set(\"Previous_Position\", 5);\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 660,
+        "wires": [
+            [
+                "e14da16caa442199"
+            ]
+        ]
+    },
+    {
+        "id": "34d91e323ce127fe",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "// Retrieve the current Previous_Position value\nvar previous = flow.get(\"Previous_Position\");\n\n// Determine points to add based on the Previous_Position value\nvar pointsToAdd = (previous === 4) ? 5 : 3;\n\n// Retrieve the current Jojo_Points (defaulting to 0 if not set)\nvar jojoPoints = flow.get(\"Jojo_Points\") || 0;\n\n// Add the determined points\njojoPoints += pointsToAdd;\n\n// Update the global variable\nflow.set(\"Jojo_Points\", jojoPoints);\n\nflow.set(\"Previous_Position\", 6)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 740,
+        "wires": [
+            [
+                "7f9d6ceaaa1dc396"
+            ]
+        ]
+    },
+    {
+        "id": "0d53439b9e797314",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "flow.set(\"Previous_Position\", 7)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 820,
+        "wires": [
+            [
+                "c187a4c48fc76767"
+            ]
+        ]
+    },
+    {
+        "id": "636a5f8f0330433c",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "// Retrieve the current Previous_Position value\nvar previous = flow.get(\"Previous_Position\");\n\n// Determine points to add based on the Previous_Position value\nvar pointsToAdd = (previous === 3 || previous === 4) ? 5 : 3;\n\n// Retrieve the current Jojo_Points (defaulting to 0 if not set)\nvar dadPoints = flow.get(\"Dad_Points\") || 0;\n\n// Add the determined points\ndadPoints += pointsToAdd;\n\n// Update the global variable\nflow.set(\"Dad_Points\", dadPoints);\n\nflow.set(\"Previous_Position\", 8);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 900,
+        "wires": [
+            [
+                "17d04aecf89a1428"
+            ]
+        ]
+    },
+    {
+        "id": "a4addbab4dad05fb",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "// Retrieve the current Previous_Position value\nvar previous = flow.get(\"Previous_Position\");\n\n// Determine points to add based on the Previous_Position value\nvar pointsToAdd = (previous === 7) ? 5 : 3;\n\n// Retrieve the current Jojo_Points (defaulting to 0 if not set)\nvar dadPoints = flow.get(\"Dad_Points\") || 0;\n\n// Add the determined points\ndadPoints += pointsToAdd;\n\n// Update the global variable\nflow.set(\"Dad_Points\", dadPoints);\n\nflow.set(\"Previous_Position\", 9)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 980,
+        "wires": [
+            [
+                "8dc5c25472ed3d51"
+            ]
+        ]
+    },
+    {
+        "id": "4a23ce43e2a552d7",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Update Position & Points",
+        "func": "return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2950,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a7f3bc76956cf5e6",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Check Camera State",
+        "func": "if (flow.get(\"cameraActive\")) {\n    // Only pass the message if the camera is active\n    return msg;\n}\nreturn null; // Otherwise, drop the message",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 140,
+        "wires": [
+            [
+                "933d97f38f646fe2"
+            ]
+        ]
+    },
+    {
+        "id": "799b0ec3fc522aed",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Victory Points",
+        "func": "msg.Jojo_Points = \"WINS!!!!\";\nmsg.Dad_Points = \"LOSES!!!!\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 3860,
+        "y": 1140,
+        "wires": [
+            [
+                "99278fc3dfdf9a4b"
+            ]
+        ]
+    },
+    {
+        "id": "0d07a554c07368c5",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=No_Grips value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3410,
+        "y": 420,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "8772ebcf21d77ca2",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Grips value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3400,
+        "y": 500,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e9279ac570163c99",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Guard value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3400,
+        "y": 580,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e14da16caa442199",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Side_Control value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3430,
+        "y": 660,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7f9d6ceaaa1dc396",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Mount value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3400,
+        "y": 740,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c187a4c48fc76767",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=In_Guard value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3410,
+        "y": 820,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "17d04aecf89a1428",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=In_Side_Control value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3440,
+        "y": 900,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "8dc5c25472ed3d51",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=In_Mount value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3410,
+        "y": 980,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6b5479fde5876704",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Arm_Bar value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3390,
+        "y": 1260,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "f3203a821e0a25b6",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,submissions=Arm_Bar value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 3410,
+        "y": 1180,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "4f34aff1062b90db",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Get Points",
+        "func": "msg.payload = {\n        Jojo_Points: 0,\n        Dad_Points: 8\n    };\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 4770,
+        "y": 1480,
+        "wires": [
+            [
+                "a42d5a35e73b49f7",
+                "8a01d9cdb456f9c8"
+            ]
+        ]
+    },
+    {
+        "id": "a42d5a35e73b49f7",
+        "type": "influxdb out",
+        "z": "ac4ec082e1f6110b",
+        "influxdb": "3d3f98127f512392",
+        "name": "bjj_trainer DB",
+        "measurement": "ATOSTACOMA",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 5000,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "2f7e3ca24aa280a3",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 4580,
+        "y": 1480,
+        "wires": [
+            [
+                "4f34aff1062b90db"
+            ]
+        ]
+    },
+    {
+        "id": "8a01d9cdb456f9c8",
+        "type": "debug",
+        "z": "ac4ec082e1f6110b",
+        "name": "debug 34",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 5080,
+        "y": 1600,
+        "wires": []
+    },
+    {
+        "id": "b00a16bcda368647",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "function 2",
+        "func": "if (\n    !isNaN(msg.payload.temperature) ||\n    !isNaN(msg.payload.humidity) ||\n    !isNaN(msg.payload.heatIndex)\n) {\n    msg.payload = {\n        temp: msg.payload.temperature,\n        hum: msg.payload.humidity,\n        heat: msg.payload.heatIndex\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 4780,
+        "y": 1560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3a1cd02d692cd85f",
+        "type": "function",
+        "z": "ac4ec082e1f6110b",
+        "name": "Get Points",
+        "func": "msg.Jojo_Points = flow.get(\"Jojo_Points\");\nmsg.Dad_Points = flow.get(\"Dad_Points\");\n\nmsg.payload = {\n        Jojo_Points: msg.Jojo_Points,\n        Dad_Points: msg.Dad_Points\n    };\nreturn msg\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 3150,
+        "y": 1320,
+        "wires": [
+            [
+                "a71332bd47d7b8d6"
+            ]
+        ]
+    },
+    {
+        "id": "a71332bd47d7b8d6",
+        "type": "influxdb out",
+        "z": "ac4ec082e1f6110b",
+        "influxdb": "3d3f98127f512392",
+        "name": "bjj_trainer DB",
+        "measurement": "ATOSTACOMA",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 3380,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "b0c881012b5aef94",
+        "type": "inject",
+        "z": "ac4ec082e1f6110b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1820,
+        "wires": [
+            [
+                "c2ff7b7cae7cca74",
+                "55a31d0cf6eedbd6"
+            ]
+        ]
+    },
+    {
+        "id": "c2ff7b7cae7cca74",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,position=Arm_Bar value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 630,
+        "y": 1760,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "55a31d0cf6eedbd6",
+        "type": "exec",
+        "z": "ac4ec082e1f6110b",
+        "command": "influx -database 'bjj_trainer' -execute \"INSERT ATOSTACOMA,submissions=Arm_Bar value=1\"",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 650,
+        "y": 1880,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "28591684864218af",
+        "type": "ui_group",
+        "name": "BJJ COPILOT",
+        "tab": "fc9b6aa040155a40",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "262d523436a1548f",
+        "type": "board-config",
+        "board": "GrovePi"
+    },
+    {
+        "id": "3d3f98127f512392",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "bjj_trainer",
+        "name": "influxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "1.x",
+        "url": "http://localhost:8086",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "fc9b6aa040155a40",
+        "type": "ui_tab",
+        "name": "Final_Project",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
